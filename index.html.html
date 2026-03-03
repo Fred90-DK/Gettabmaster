@@ -2,284 +2,810 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>TabMaster - Smart Tab Manager for Chrome</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>FKTech – Chrome Extensions</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#080810;--surf:#0f0f1a;--surf2:#16162a;--bord:#1e1e35;--acc:#6c63ff;--gold:#ffd700;--txt:#e8e8f5;--muted:#7070a0;--green:#43d9ad}
+:root{
+  --bg:#07080f;
+  --bg2:#0d0e18;
+  --surf:#111220;
+  --surf2:#181928;
+  --bord:#1e2035;
+  --bord2:#262840;
+  --txt:#eeeef8;
+  --muted:#6668a0;
+  --muted2:#9092c0;
+  --acc:#00e5ff;
+  --acc2:#7c3aed;
+  --green:#00ff88;
+  --gold:#fbbf24;
+  --danger:#ff4d6d;
+  --tm:#6c63ff;
+  --co:#7c3aed;
+}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--txt);font-family:"DM Sans",sans-serif;min-height:100vh}
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;padding:0 40px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,8,16,.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--bord)}
-.logo{display:flex;align-items:center;gap:10px;cursor:pointer}
-.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#6c63ff,#4f46e5);border-radius:8px;display:grid;place-items:center;font-size:15px}
-.logo-text{font-family:"Syne",sans-serif;font-weight:800;font-size:18px}
-.nav-links{display:flex;gap:4px}
-.nl{padding:7px 15px;border-radius:8px;color:var(--muted);font-size:14px;font-weight:500;cursor:pointer;border:none;background:none;transition:.15s}
-.nl:hover,.nl.on{color:var(--txt);background:var(--surf2)}
-.add-btn{padding:8px 20px;background:var(--acc);color:#fff;border-radius:8px;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:.15s}
-.add-btn:hover{background:#7c74ff;transform:translateY(-1px)}
-/* PAGES */
-.pg{display:none;padding-top:64px;min-height:100vh}
+body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* ── GRID PATTERN BG ── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:linear-gradient(var(--bord) 1px,transparent 1px),linear-gradient(90deg,var(--bord) 1px,transparent 1px);
+  background-size:60px 60px;opacity:.25;pointer-events:none;z-index:0;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:60px;padding:0 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(7,8,15,.92);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--bord);
+}
+.nav-brand{display:flex;align-items:center;gap:12px;cursor:pointer;text-decoration:none}
+.nav-brand-mark{
+  width:32px;height:32px;background:var(--acc);border-radius:6px;
+  display:grid;place-items:center;
+  font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#000;
+  flex-shrink:0;
+}
+.nav-brand-name{font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--txt);letter-spacing:.5px}
+.nav-brand-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.nav-links{display:flex;gap:2px;align-items:center}
+.nl{padding:6px 14px;border-radius:7px;color:var(--muted2);font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;transition:.15s;font-family:'Outfit',sans-serif}
+.nl:hover{color:var(--txt);background:var(--surf2)}
+.nl.on{color:var(--acc);background:rgba(0,229,255,.08)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.ext-count{
+  padding:4px 12px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);
+  border-radius:20px;font-size:11px;font-weight:700;color:var(--acc);
+  font-family:'Space Mono',monospace;
+}
+
+/* ── PAGES ── */
+.pg{display:none;padding-top:60px;min-height:100vh;position:relative;z-index:1}
 .pg.on{display:block}
-/* HOME */
-.hero{max-width:1100px;margin:0 auto;padding:96px 40px 72px;text-align:center}
-.badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.3);border-radius:20px;font-size:13px;color:var(--acc);font-weight:500;margin-bottom:28px}
-.dot{width:6px;height:6px;background:var(--acc);border-radius:50%;animation:blink 2s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
-h1{font-family:"Syne",sans-serif;font-size:clamp(40px,6vw,74px);font-weight:800;line-height:1.06;letter-spacing:-2px;margin-bottom:22px}
-.grad{background:linear-gradient(120deg,var(--acc),#a78bfa,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.sub{font-size:18px;color:var(--muted);max-width:540px;margin:0 auto 44px;font-weight:300;line-height:1.65}
-.btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-.bp{padding:13px 30px;background:var(--acc);color:#fff;border-radius:10px;font-size:15px;font-weight:600;border:none;cursor:pointer;transition:.18s;display:inline-flex;align-items:center;gap:8px}
-.bp:hover{background:#7c74ff;transform:translateY(-2px);box-shadow:0 12px 36px rgba(108,99,255,.4)}
-.bs{padding:13px 30px;background:var(--surf2);color:var(--txt);border-radius:10px;font-size:15px;font-weight:600;border:1px solid var(--bord);cursor:pointer;transition:.18s}
-.bs:hover{border-color:var(--acc);transform:translateY(-2px)}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:680px;margin:0 auto 72px;padding:0 40px}
-.sc{text-align:center;padding:28px 16px;background:var(--surf);border:1px solid var(--bord);border-radius:14px}
-.sn{font-family:"Syne",sans-serif;font-size:40px;font-weight:800;background:linear-gradient(135deg,var(--acc),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.sl{color:var(--muted);font-size:12px;margin-top:4px}
-.feats{max-width:1100px;margin:0 auto;padding:0 40px 90px}
-.slbl{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--acc);font-weight:600;margin-bottom:14px}
-.stit{font-family:"Syne",sans-serif;font-size:clamp(26px,4vw,40px);font-weight:800;margin-bottom:44px;letter-spacing:-1px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px}
-.fc{padding:30px;background:var(--surf);border:1px solid var(--bord);border-radius:14px;transition:.22s}
-.fc:hover{border-color:rgba(108,99,255,.4);transform:translateY(-4px);box-shadow:0 18px 50px rgba(0,0,0,.4)}
-.fi{width:46px;height:46px;background:rgba(108,99,255,.14);border-radius:11px;display:grid;place-items:center;font-size:21px;margin-bottom:18px}
-.ft{font-family:"Syne",sans-serif;font-size:17px;font-weight:700;margin-bottom:8px}
-.fd{color:var(--muted);font-size:13px;line-height:1.7}
-/* INNER PAGES */
-.inner{max-width:750px;margin:0 auto;padding:56px 40px 90px}
-.ph{margin-bottom:52px}
-.ph h2{font-family:"Syne",sans-serif;font-size:clamp(30px,5vw,50px);font-weight:800;letter-spacing:-1.5px;margin-bottom:10px}
-.ph p{color:var(--muted)}
-.upd{display:inline-block;margin-top:10px;padding:3px 10px;background:var(--surf2);border-radius:5px;font-size:11px;color:var(--muted)}
-.ds{margin-bottom:44px}
-.ds h3{font-family:"Syne",sans-serif;font-size:19px;font-weight:700;margin-bottom:14px;padding-bottom:9px;border-bottom:1px solid var(--bord)}
-.ds p{color:var(--muted);margin-bottom:12px;line-height:1.8;font-size:15px}
-.ds ul{color:var(--muted);padding-left:22px;line-height:2;font-size:15px}
-.ds a{color:var(--acc);text-decoration:none;cursor:pointer}
-.ds a:hover{text-decoration:underline}
-.hbox{padding:18px 22px;background:rgba(108,99,255,.08);border:1px solid rgba(108,99,255,.2);border-radius:9px;margin:18px 0}
-.hbox p{color:var(--txt);margin:0;font-size:14px}
-/* CONTACT */
-.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:44px;margin-top:36px}
-.ci{display:flex;gap:12px;margin-bottom:14px;padding:18px;background:var(--surf);border:1px solid var(--bord);border-radius:11px}
-.cii{width:38px;height:38px;background:rgba(108,99,255,.15);border-radius:9px;display:grid;place-items:center;font-size:17px;flex-shrink:0}
-.cit strong{display:block;font-size:13px;font-weight:600;margin-bottom:2px}
-.cit span{font-size:12px;color:var(--muted)}
-.fg{margin-bottom:18px}
-.fg label{display:block;font-size:12px;font-weight:600;margin-bottom:7px}
-.fc2{width:100%;padding:11px 14px;background:var(--surf);border:1px solid var(--bord);border-radius:9px;color:var(--txt);font-family:"DM Sans",sans-serif;font-size:13px;outline:none;transition:.18s;resize:none}
-.fc2:focus{border-color:var(--acc)}
-.fc2::placeholder{color:var(--muted)}
-.fsub{width:100%;padding:13px;background:var(--acc);color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;transition:.15s;font-family:"DM Sans",sans-serif}
-.fsub:hover{background:#7c74ff}
-.fsuc{display:none;padding:16px;background:rgba(67,217,173,.1);border:1px solid rgba(67,217,173,.3);border-radius:9px;color:var(--green);font-size:13px;text-align:center;margin-top:14px}
-/* SUPPORT */
-.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:44px}
-.scard{padding:22px;background:var(--surf);border:1px solid var(--bord);border-radius:11px;cursor:pointer;transition:.2s;color:inherit;text-decoration:none;display:block}
-.scard:hover{border-color:var(--acc);transform:translateY(-3px)}
-.scard-ic{font-size:26px;margin-bottom:10px}
-.scard h4{font-family:"Syne",sans-serif;font-size:15px;font-weight:700;margin-bottom:5px}
-.scard p{font-size:12px;color:var(--muted)}
-.faq{border:1px solid var(--bord);border-radius:11px;margin-bottom:10px;overflow:hidden}
-.fq{padding:16px 18px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:500;font-size:14px;transition:.15s}
-.fq:hover{background:var(--surf2)}
-.chev{transition:.22s;color:var(--muted);font-size:11px}
-.fq.open .chev{transform:rotate(180deg)}
-.fa{max-height:0;overflow:hidden;transition:max-height .3s ease}
-.fa.open{max-height:300px}
-.fa-in{padding:0 18px 16px;color:var(--muted);font-size:13px;line-height:1.8}
-/* FOOTER */
-footer{border-top:1px solid var(--bord);padding:28px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-.fl{color:var(--muted);font-size:12px}
-.flinks{display:flex;gap:20px;flex-wrap:wrap}
-.flinks a{color:var(--muted);font-size:12px;text-decoration:none;cursor:pointer;transition:.15s}
-.flinks a:hover{color:var(--txt)}
-@media(max-width:640px){nav{padding:0 18px}.nav-links{display:none}.hero,.feats{padding-left:18px;padding-right:18px}.inner{padding:36px 18px 70px}.stats{grid-template-columns:1fr;padding:0 18px}.cgrid{grid-template-columns:1fr}footer{padding:20px 18px;flex-direction:column;text-align:center}}
+
+/* ── HOME ── */
+.home-hero{
+  max-width:1160px;margin:0 auto;padding:80px 32px 60px;
+  display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;
+}
+@media(max-width:800px){.home-hero{grid-template-columns:1fr;padding:48px 20px 40px}}
+.hero-left{}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:5px 14px;border:1px solid var(--bord2);border-radius:20px;
+  font-family:'Space Mono',monospace;font-size:11px;color:var(--muted2);
+  margin-bottom:24px;
+}
+.hero-eyebrow span{width:6px;height:6px;background:var(--green);border-radius:50%;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+h1{
+  font-family:'Outfit',sans-serif;
+  font-size:clamp(36px,5vw,62px);font-weight:800;
+  line-height:1.08;letter-spacing:-1.5px;margin-bottom:20px;
+}
+.h1-line2{color:var(--acc)}
+.hero-sub{font-size:16px;color:var(--muted2);line-height:1.7;max-width:460px;margin-bottom:36px;font-weight:300}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn-acc{
+  padding:11px 26px;background:var(--acc);color:#000;border-radius:8px;
+  font-size:14px;font-weight:700;border:none;cursor:pointer;transition:.15s;
+  font-family:'Outfit',sans-serif;
+}
+.btn-acc:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,229,255,.3)}
+.btn-ghost{
+  padding:11px 26px;background:transparent;color:var(--txt);border-radius:8px;
+  font-size:14px;font-weight:600;border:1px solid var(--bord2);cursor:pointer;transition:.15s;
+  font-family:'Outfit',sans-serif;
+}
+.btn-ghost:hover{border-color:var(--acc);color:var(--acc)}
+.hero-right{display:flex;flex-direction:column;gap:12px}
+.hero-stat-card{
+  padding:20px 24px;background:var(--surf);border:1px solid var(--bord2);border-radius:12px;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:.2s;
+}
+.hero-stat-card:hover{border-color:var(--acc);transform:translateX(4px)}
+.hs-left{display:flex;align-items:center;gap:14px}
+.hs-icon{
+  width:40px;height:40px;border-radius:9px;
+  display:grid;place-items:center;font-size:18px;flex-shrink:0;
+}
+.hs-name{font-size:15px;font-weight:700}
+.hs-desc{font-size:12px;color:var(--muted2);margin-top:1px}
+.hs-badge{
+  font-family:'Space Mono',monospace;font-size:11px;font-weight:700;
+  padding:3px 10px;border-radius:5px;
+}
+.live{background:rgba(0,255,136,.1);color:var(--green);border:1px solid rgba(0,255,136,.2)}
+.review{background:rgba(251,191,36,.1);color:var(--gold);border:1px solid rgba(251,191,36,.2)}
+.soon{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--bord)}
+
+/* ── EXTENSIONS GRID ── */
+.section{max-width:1160px;margin:0 auto;padding:0 32px 80px}
+.section-head{display:flex;align-items:baseline;gap:16px;margin-bottom:32px}
+.section-head h2{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--acc);letter-spacing:1px;text-transform:uppercase}
+.section-head-line{flex:1;height:1px;background:var(--bord)}
+.ext-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+
+.ext-card{
+  background:var(--surf);border:1px solid var(--bord);border-radius:14px;
+  overflow:hidden;cursor:pointer;transition:.22s;
+  display:flex;flex-direction:column;
+}
+.ext-card:hover{border-color:var(--bord2);transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.ext-card-header{padding:24px 24px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.ext-card-icon{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;font-size:24px;flex-shrink:0}
+.ext-card-status{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.ext-card-body{padding:16px 24px 24px;flex:1;display:flex;flex-direction:column}
+.ext-card-name{font-size:18px;font-weight:800;letter-spacing:-.3px;margin-bottom:6px}
+.ext-card-tagline{font-size:13px;color:var(--muted2);line-height:1.6;margin-bottom:16px;flex:1}
+.ext-card-features{display:flex;flex-direction:column;gap:5px;margin-bottom:20px}
+.ecf{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted2)}
+.ecf::before{content:'';width:5px;height:5px;background:var(--acc);border-radius:50%;flex-shrink:0}
+.ext-card-footer{display:flex;gap:8px;padding:16px 24px;border-top:1px solid var(--bord);background:var(--bg2)}
+.btn-sm-acc{
+  flex:1;padding:9px;background:var(--acc);color:#000;
+  border-radius:7px;font-size:13px;font-weight:700;border:none;cursor:pointer;transition:.15s;text-align:center;
+  font-family:'Outfit',sans-serif;
+}
+.btn-sm-acc:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,229,255,.3)}
+.btn-sm-ghost{
+  flex:1;padding:9px;background:transparent;color:var(--muted2);
+  border-radius:7px;font-size:13px;font-weight:600;border:1px solid var(--bord);cursor:pointer;transition:.15s;text-align:center;
+  font-family:'Outfit',sans-serif;
+}
+.btn-sm-ghost:hover{border-color:var(--bord2);color:var(--txt)}
+
+/* coming soon card */
+.ext-card.soon-card{opacity:.65;cursor:default}
+.ext-card.soon-card:hover{transform:none;box-shadow:none;border-color:var(--bord)}
+.soon-overlay{
+  display:flex;align-items:center;justify-content:center;
+  padding:8px 0 20px;
+}
+.soon-pill{
+  padding:4px 14px;background:var(--surf2);border:1px solid var(--bord);
+  border-radius:20px;font-size:11px;color:var(--muted);font-weight:600;
+  font-family:'Space Mono',monospace;
+}
+
+/* ── EXTENSION DETAIL PAGE ── */
+.ext-detail-hero{
+  max-width:1160px;margin:0 auto;padding:60px 32px 40px;
+  display:grid;grid-template-columns:1fr 380px;gap:60px;align-items:start;
+}
+@media(max-width:900px){.ext-detail-hero{grid-template-columns:1fr;padding:40px 20px 30px}}
+.edh-back{
+  display:inline-flex;align-items:center;gap:6px;
+  color:var(--muted);font-size:13px;cursor:pointer;border:none;background:none;
+  margin-bottom:28px;transition:.15s;font-family:'Outfit',sans-serif;
+}
+.edh-back:hover{color:var(--acc)}
+.edh-icon-row{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.edh-icon{width:64px;height:64px;border-radius:16px;display:grid;place-items:center;font-size:30px}
+.edh-name{font-family:'Outfit',sans-serif;font-size:clamp(28px,4vw,46px);font-weight:800;letter-spacing:-1px}
+.edh-tag{font-size:15px;color:var(--muted2);margin-bottom:28px;font-weight:300;line-height:1.7;max-width:540px}
+.edh-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px}
+.btn-lg-acc{
+  padding:13px 32px;background:var(--acc);color:#000;
+  border-radius:9px;font-size:15px;font-weight:700;border:none;cursor:pointer;transition:.15s;
+  font-family:'Outfit',sans-serif;display:inline-flex;align-items:center;gap:8px;
+}
+.btn-lg-acc:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(0,229,255,.35)}
+.edh-meta{display:flex;gap:20px;flex-wrap:wrap}
+.edh-meta-item{font-size:12px;color:var(--muted);font-family:'Space Mono',monospace}
+.edh-meta-item span{color:var(--muted2)}
+.edh-sidebar{display:flex;flex-direction:column;gap:14px;position:sticky;top:80px}
+.sidebar-card{
+  background:var(--surf);border:1px solid var(--bord);border-radius:12px;padding:20px;
+}
+.sc-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.sc-stat-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bord)}
+.sc-stat-row:last-child{border-bottom:none}
+.sc-stat-label{font-size:13px;color:var(--muted2)}
+.sc-stat-val{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--txt)}
+
+/* ext detail features */
+.ext-detail-body{max-width:1160px;margin:0 auto;padding:0 32px 80px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:900px){.ext-detail-body{grid-template-columns:1fr;padding:0 20px 60px}}
+.edb-card{background:var(--surf);border:1px solid var(--bord);border-radius:12px;padding:28px}
+.edb-card h3{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.edb-card p,.edb-card li{font-size:14px;color:var(--muted2);line-height:1.75}
+.edb-card ul{padding-left:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.edb-card li::before{content:'→ ';color:var(--acc);font-family:'Space Mono',monospace;font-size:11px}
+.edb-card.full{grid-column:1/-1}
+
+/* permissions table */
+.perm-row{display:grid;grid-template-columns:140px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--bord);font-size:13px}
+.perm-row:last-child{border-bottom:none}
+.perm-name{font-family:'Space Mono',monospace;font-size:11px;color:var(--acc);font-weight:700;align-self:start;padding-top:2px}
+.perm-desc{color:var(--muted2);line-height:1.6}
+
+/* ── INNER PAGES (Privacy, Terms, Contact, Support) ── */
+.inner{max-width:760px;margin:0 auto;padding:60px 32px 90px}
+@media(max-width:640px){.inner{padding:40px 20px 70px}}
+.inner-wide{max-width:1000px;margin:0 auto;padding:60px 32px 90px}
+.pg-header{margin-bottom:52px}
+.pg-header .eyebrow{font-family:'Space Mono',monospace;font-size:11px;color:var(--acc);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px}
+.pg-header h2{font-size:clamp(30px,5vw,48px);font-weight:800;letter-spacing:-1.5px;margin-bottom:10px}
+.pg-header p{color:var(--muted2);font-size:15px;font-weight:300}
+.upd{display:inline-block;margin-top:10px;padding:3px 10px;background:var(--surf2);border-radius:5px;font-size:11px;color:var(--muted);font-family:'Space Mono',monospace}
+.doc-section{margin-bottom:44px}
+.doc-section h3{font-size:17px;font-weight:700;margin-bottom:14px;padding-bottom:9px;border-bottom:1px solid var(--bord);display:flex;align-items:center;gap:10px}
+.doc-section h3 .num{font-family:'Space Mono',monospace;font-size:11px;color:var(--acc);font-weight:700;min-width:24px}
+.doc-section p{color:var(--muted2);margin-bottom:12px;line-height:1.8;font-size:14px}
+.doc-section ul{color:var(--muted2);padding-left:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.doc-section li{padding-left:16px;position:relative;line-height:1.7}
+.doc-section li::before{content:'–';position:absolute;left:0;color:var(--muted)}
+.doc-section a{color:var(--acc);text-decoration:none;cursor:pointer}
+.doc-section a:hover{text-decoration:underline}
+.info-box{padding:16px 20px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.15);border-radius:9px;margin:18px 0;font-size:13px;color:var(--txt)}
+
+/* contact */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:44px}
+@media(max-width:680px){.contact-grid{grid-template-columns:1fr}}
+.contact-info-item{
+  display:flex;gap:12px;align-items:flex-start;
+  padding:16px 18px;background:var(--surf);border:1px solid var(--bord);
+  border-radius:10px;margin-bottom:12px;transition:.15s;
+}
+.contact-info-item:hover{border-color:var(--bord2)}
+.cii-icon{width:36px;height:36px;background:rgba(0,229,255,.1);border-radius:8px;display:grid;place-items:center;font-size:16px;flex-shrink:0}
+.cii-text strong{display:block;font-size:13px;font-weight:600;margin-bottom:2px}
+.cii-text span{font-size:12px;color:var(--muted);font-family:'Space Mono',monospace}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:12px;font-weight:600;margin-bottom:7px;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px;font-family:'Space Mono',monospace}
+.form-ctrl{
+  width:100%;padding:10px 14px;background:var(--surf);border:1px solid var(--bord);
+  border-radius:8px;color:var(--txt);font-family:'Outfit',sans-serif;font-size:14px;
+  outline:none;transition:.18s;resize:none;
+}
+.form-ctrl:focus{border-color:var(--acc);background:var(--surf2)}
+.form-ctrl::placeholder{color:var(--muted)}
+.form-submit{
+  width:100%;padding:12px;background:var(--acc);color:#000;
+  border:none;border-radius:8px;font-size:14px;font-weight:700;
+  cursor:pointer;transition:.15s;font-family:'Outfit',sans-serif;
+}
+.form-submit:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,229,255,.3)}
+.form-success{
+  display:none;padding:14px;background:rgba(0,255,136,.07);
+  border:1px solid rgba(0,255,136,.2);border-radius:8px;
+  color:var(--green);font-size:13px;text-align:center;margin-top:12px;
+  font-family:'Space Mono',monospace;
+}
+
+/* support */
+.support-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:44px}
+.support-card{
+  padding:20px;background:var(--surf);border:1px solid var(--bord);
+  border-radius:10px;cursor:pointer;transition:.2s;
+}
+.support-card:hover{border-color:var(--acc);transform:translateY(-3px)}
+.support-card-ico{font-size:24px;margin-bottom:10px}
+.support-card h4{font-size:14px;font-weight:700;margin-bottom:4px}
+.support-card p{font-size:12px;color:var(--muted)}
+.faq-item{border:1px solid var(--bord);border-radius:10px;margin-bottom:8px;overflow:hidden}
+.faq-q{
+  padding:14px 18px;cursor:pointer;display:flex;
+  justify-content:space-between;align-items:center;
+  font-weight:500;font-size:14px;transition:.15s;
+}
+.faq-q:hover{background:var(--surf2)}
+.chev{transition:.22s;color:var(--muted);font-size:11px;font-family:'Space Mono',monospace}
+.faq-q.open .chev{transform:rotate(180deg);color:var(--acc)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.faq-a.open{max-height:300px}
+.faq-a-in{padding:0 18px 14px;color:var(--muted2);font-size:13px;line-height:1.8}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--bord);padding:28px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;position:relative;z-index:1;
+  background:rgba(7,8,15,.8);
+}
+.footer-brand{display:flex;align-items:center;gap:10px}
+.footer-mark{
+  width:24px;height:24px;background:var(--acc);border-radius:5px;
+  display:grid;place-items:center;
+  font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:#000;
+}
+.footer-name{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{color:var(--muted);font-size:12px;text-decoration:none;cursor:pointer;transition:.15s;font-family:'Space Mono',monospace}
+.footer-links a:hover{color:var(--acc)}
+
+/* color overrides per extension */
+.tm-acc{color:var(--tm)}
+.co-acc{color:var(--co)}
+.tm-bg{background:rgba(108,99,255,.12)}
+.co-bg{background:rgba(124,58,237,.12)}
+.tm-bord{border-color:rgba(108,99,255,.3)}
+.co-bord{border-color:rgba(124,58,237,.3)}
+
+/* responsive */
+@media(max-width:640px){
+  nav{padding:0 16px}
+  .nav-links{display:none}
+  footer{padding:20px 16px;flex-direction:column;text-align:center}
+  .section{padding:0 16px 60px}
+  .ext-detail-body{padding:0 16px 60px}
+}
 </style>
 </head>
 <body>
 
 <nav>
-  <div class="logo" onclick="go('home')">
-    <div class="logo-icon">&#9889;</div>
-    <span class="logo-text">TabMaster</span>
+  <div class="nav-brand" onclick="go('home')">
+    <div class="nav-brand-mark">FK</div>
+    <div>
+      <div class="nav-brand-name">FKTech</div>
+      <div class="nav-brand-sub">Chrome Extensions</div>
+    </div>
   </div>
   <div class="nav-links">
-    <button class="nl on" id="nl-home" onclick="go('home')">Home</button>
+    <button class="nl on" id="nl-home" onclick="go('home')">All Extensions</button>
+    <button class="nl" id="nl-tabmaster" onclick="go('tabmaster')">TabMaster</button>
+    <button class="nl" id="nl-chatorganiser" onclick="go('chatorganiser')">ChatOrganiser</button>
     <button class="nl" id="nl-support" onclick="go('support')">Support</button>
     <button class="nl" id="nl-privacy" onclick="go('privacy')">Privacy</button>
     <button class="nl" id="nl-terms" onclick="go('terms')">Terms</button>
     <button class="nl" id="nl-contact" onclick="go('contact')">Contact</button>
   </div>
-  <button class="add-btn" onclick="window.open('https://chromewebstore.google.com','_blank')">Add to Chrome &#8212; Free</button>
+  <div class="nav-right">
+    <div class="ext-count">2 extensions</div>
+  </div>
 </nav>
 
-<!-- HOME -->
+<!-- ══════════════════════════════════════════════
+     HOME
+══════════════════════════════════════════════ -->
 <div class="pg on" id="pg-home">
-  <div class="hero">
-    <div class="badge"><span class="dot"></span> Now on the Chrome Web Store</div>
-    <h1>Stop the<br/><span class="grad">tab chaos.</span><br/>Finally.</h1>
-    <p class="sub">TabMaster automatically groups, suspends and searches all your browser tabs &#8212; saving 80% RAM in one click.</p>
-    <div class="btns">
-      <button class="bp" onclick="window.open('https://chromewebstore.google.com','_blank')">&#9889; Add to Chrome &#8212; Free</button>
-      <button class="bs" onclick="go('support')">See how it works</button>
+  <div class="home-hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow"><span></span> FKTech &mdash; Made in Denmark</div>
+      <h1>Browser tools<br/>that <span class="h1-line2">actually work.</span></h1>
+      <p class="hero-sub">A growing collection of Chrome extensions built to solve real, everyday frustrations. No bloat. No tracking. Just tools that do what they say.</p>
+      <div class="hero-actions">
+        <button class="btn-acc" onclick="document.getElementById('ext-section').scrollIntoView({behavior:'smooth'})">Browse extensions</button>
+        <button class="btn-ghost" onclick="go('contact')">Get in touch</button>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-stat-card" onclick="go('tabmaster')" style="cursor:pointer">
+        <div class="hs-left">
+          <div class="hs-icon" style="background:rgba(108,99,255,.15)">&#9889;</div>
+          <div>
+            <div class="hs-name">TabMaster</div>
+            <div class="hs-desc">Stop the tab chaos. Group, suspend, search.</div>
+          </div>
+        </div>
+        <div class="hs-badge live">IN REVIEW</div>
+      </div>
+      <div class="hero-stat-card" onclick="go('chatorganiser')" style="cursor:pointer">
+        <div class="hs-left">
+          <div class="hs-icon" style="background:rgba(124,58,237,.15)">&#129302;</div>
+          <div>
+            <div class="hs-name">ChatOrganiser</div>
+            <div class="hs-desc">Search all AI chats in one place.</div>
+          </div>
+        </div>
+        <div class="hs-badge review">IN REVIEW</div>
+      </div>
+      <div class="hero-stat-card">
+        <div class="hs-left">
+          <div class="hs-icon" style="background:rgba(255,255,255,.05)">&#128269;</div>
+          <div>
+            <div class="hs-name">More coming</div>
+            <div class="hs-desc">Research multi-search &amp; more planned.</div>
+          </div>
+        </div>
+        <div class="hs-badge soon">SOON</div>
+      </div>
     </div>
   </div>
-  <div class="stats">
-    <div class="sc"><div class="sn">80%</div><div class="sl">RAM saved on average</div></div>
-    <div class="sc"><div class="sn">1</div><div class="sl">Click to organise all tabs</div></div>
-    <div class="sc"><div class="sn">847x</div><div class="sl">Requested by real users</div></div>
+
+  <div class="section" id="ext-section">
+    <div class="section-head">
+      <h2>Extensions</h2>
+      <div class="section-head-line"></div>
+    </div>
+    <div class="ext-grid">
+
+      <!-- TabMaster -->
+      <div class="ext-card" onclick="go('tabmaster')">
+        <div class="ext-card-header">
+          <div class="ext-card-icon" style="background:rgba(108,99,255,.15)">&#9889;</div>
+          <div class="ext-card-status">
+            <div class="hs-badge live">LIVE</div>
+          </div>
+        </div>
+        <div class="ext-card-body">
+          <div class="ext-card-name tm-acc">TabMaster</div>
+          <div class="ext-card-tagline">Stop the tab chaos. Automatically group, suspend, and search all your open browser tabs in one click.</div>
+          <div class="ext-card-features">
+            <div class="ecf">Smart tab grouping by domain</div>
+            <div class="ecf">Suspend inactive tabs &mdash; save 80% RAM</div>
+            <div class="ecf">Duplicate tab detection &amp; removal</div>
+            <div class="ecf">Search across all open tabs</div>
+          </div>
+        </div>
+        <div class="ext-card-footer">
+          <button class="btn-sm-acc" onclick="event.stopPropagation();window.open('https://chromewebstore.google.com','_blank')">Add to Chrome</button>
+          <button class="btn-sm-ghost" onclick="event.stopPropagation();go('tabmaster')">Learn more</button>
+        </div>
+      </div>
+
+      <!-- ChatOrganiser -->
+      <div class="ext-card" onclick="go('chatorganiser')">
+        <div class="ext-card-header">
+          <div class="ext-card-icon" style="background:rgba(124,58,237,.15)">&#129302;</div>
+          <div class="ext-card-status">
+            <div class="hs-badge review">IN REVIEW</div>
+          </div>
+        </div>
+        <div class="ext-card-body">
+          <div class="ext-card-name co-acc">ChatOrganiser</div>
+          <div class="ext-card-tagline">One search box for all your AI conversations across ChatGPT, Claude, Gemini and Perplexity.</div>
+          <div class="ext-card-features">
+            <div class="ecf">Search across 4 AI platforms at once</div>
+            <div class="ecf">Auto-syncs as you browse</div>
+            <div class="ecf">Filter by platform in one click</div>
+            <div class="ecf">100% local &mdash; no data sent anywhere</div>
+          </div>
+        </div>
+        <div class="ext-card-footer">
+          <button class="btn-sm-acc" style="background:var(--co)" onclick="event.stopPropagation();window.open('https://chromewebstore.google.com','_blank')">Notify me</button>
+          <button class="btn-sm-ghost" onclick="event.stopPropagation();go('chatorganiser')">Learn more</button>
+        </div>
+      </div>
+
+      <!-- Coming soon: Research -->
+      <div class="ext-card soon-card">
+        <div class="ext-card-header">
+          <div class="ext-card-icon" style="background:rgba(255,255,255,.05)">&#128270;</div>
+        </div>
+        <div class="ext-card-body">
+          <div class="ext-card-name" style="color:var(--muted2)">Research Hub</div>
+          <div class="ext-card-tagline">Stop copy-pasting the same query into Google, Reddit, and Stack Overflow. Search them all at once.</div>
+          <div class="ext-card-features">
+            <div class="ecf">Search Google, Reddit, HN simultaneously</div>
+            <div class="ecf">Unified results in a side panel</div>
+            <div class="ecf">Save research sessions</div>
+          </div>
+        </div>
+        <div class="soon-overlay"><div class="soon-pill">COMING SOON</div></div>
+      </div>
+
+    </div>
   </div>
-  <div class="feats">
-    <div class="slbl">What it does</div>
-    <div class="stit">Everything your browser<br/>tab bar isn&#39;t.</div>
-    <div class="grid">
-      <div class="fc"><div class="fi">&#9889;</div><div class="ft">Smart Tab Grouping</div><div class="fd">Groups all open tabs by domain automatically. 47 scattered tabs become 6 clean colour-coded groups in one click.</div></div>
-      <div class="fc"><div class="fi">&#128164;</div><div class="ft">Suspend Inactive Tabs</div><div class="fd">Free up to 80% of your RAM by suspending tabs you are not using. They reload the moment you click them.</div></div>
-      <div class="fc"><div class="fi">&#128269;</div><div class="ft">Search All Tabs</div><div class="fd">Find any open tab instantly by title or URL. No more endless scrolling through a wall of favicons.</div></div>
-      <div class="fc"><div class="fi">&#128465;</div><div class="ft">Duplicate Remover</div><div class="fd">Opened the same page three times? TabMaster finds and removes every duplicate with a single click.</div></div>
-      <div class="fc"><div class="fi">&#128202;</div><div class="ft">Live Tab Stats</div><div class="fd">A real-time dashboard in your toolbar showing groups, suspended tabs and duplicates at a glance.</div></div>
-      <div class="fc"><div class="fi">&#128274;</div><div class="ft">100% Private</div><div class="fd">Everything runs locally in your browser. We never collect, transmit or store any of your browsing data.</div></div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>About FKTech</h2>
+      <div class="section-head-line"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
+      <div class="edb-card" style="background:var(--surf);border:1px solid var(--bord);border-radius:12px;padding:24px">
+        <h3 style="font-size:14px;font-weight:700;margin-bottom:8px;color:var(--acc)">&#127963; Solo developer</h3>
+        <p style="font-size:13px;color:var(--muted2);line-height:1.7">FKTech is a one-person studio based in Denmark, building focused tools for real everyday problems.</p>
+      </div>
+      <div class="edb-card" style="background:var(--surf);border:1px solid var(--bord);border-radius:12px;padding:24px">
+        <h3 style="font-size:14px;font-weight:700;margin-bottom:8px;color:var(--acc)">&#128274; Privacy first</h3>
+        <p style="font-size:13px;color:var(--muted2);line-height:1.7">Every extension runs locally. No trackers, no analytics, no data collection. What you do in your browser stays in your browser.</p>
+      </div>
+      <div class="edb-card" style="background:var(--surf);border:1px solid var(--bord);border-radius:12px;padding:24px">
+        <h3 style="font-size:14px;font-weight:700;margin-bottom:8px;color:var(--acc)">&#9889; Free to start</h3>
+        <p style="font-size:13px;color:var(--muted2);line-height:1.7">Core features are always free. PRO tiers add power-user features for those who want more. No dark patterns.</p>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- PRIVACY -->
+<!-- ══════════════════════════════════════════════
+     TABMASTER DETAIL
+══════════════════════════════════════════════ -->
+<div class="pg" id="pg-tabmaster">
+  <div style="max-width:1160px;margin:0 auto;padding:40px 32px 0">
+    <button class="edh-back" onclick="go('home')">&#8592; All Extensions</button>
+  </div>
+  <div class="ext-detail-hero">
+    <div>
+      <div class="edh-icon-row">
+        <div class="edh-icon" style="background:rgba(108,99,255,.15)">&#9889;</div>
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--tm);margin-bottom:4px">CHROME EXTENSION</div>
+          <div class="hs-badge live" style="display:inline-block">LIVE ON CHROME WEB STORE</div>
+        </div>
+      </div>
+      <div class="edh-name tm-acc">TabMaster</div>
+      <p class="edh-tag">Stop the tab chaos. TabMaster automatically groups all your open tabs by domain, suspends inactive ones to free up to 80% RAM, removes duplicates, and lets you search every open tab in seconds.</p>
+      <div class="edh-actions">
+        <button class="btn-lg-acc" onclick="window.open('https://chromewebstore.google.com','_blank')" style="background:var(--tm)">&#9889; Add to Chrome &mdash; Free</button>
+        <button class="btn-ghost" onclick="go('support')">Support</button>
+      </div>
+      <div class="edh-meta">
+        <div class="edh-meta-item">Version: <span>1.0.0</span></div>
+        <div class="edh-meta-item">Platform: <span>Chrome</span></div>
+        <div class="edh-meta-item">Price: <span>Free</span></div>
+        <div class="edh-meta-item">Data collected: <span>None</span></div>
+      </div>
+    </div>
+    <div class="edh-sidebar">
+      <div class="sidebar-card">
+        <div class="sc-label">Extension info</div>
+        <div class="sc-stat-row"><span class="sc-stat-label">Status</span><span class="sc-stat-val" style="color:var(--green)">LIVE</span></div>
+        <div class="sc-stat-row"><span class="sc-stat-label">Version</span><span class="sc-stat-val">1.0.0</span></div>
+        <div class="sc-stat-row"><span class="sc-stat-label">Price</span><span class="sc-stat-val">Free</span></div>
+        <div class="sc-stat-row"><span class="sc-stat-label">Data collected</span><span class="sc-stat-val" style="color:var(--green)">None</span></div>
+        <div class="sc-stat-row"><span class="sc-stat-label">Manifest</span><span class="sc-stat-val">V3</span></div>
+      </div>
+      <div class="sidebar-card">
+        <div class="sc-label">Permissions</div>
+        <div class="sc-stat-row"><span class="sc-stat-label">tabs</span><span class="sc-stat-val">Local only</span></div>
+        <div class="sc-stat-row"><span class="sc-stat-label">tabGroups</span><span class="sc-stat-val">Local only</span></div>
+        <div class="sc-stat-row"><span class="sc-stat-label">storage</span><span class="sc-stat-val">Device only</span></div>
+        <div class="sc-stat-row"><span class="sc-stat-label">alarms</span><span class="sc-stat-val">Local only</span></div>
+      </div>
+      <button class="btn-lg-acc" style="background:var(--tm);width:100%" onclick="window.open('https://chromewebstore.google.com','_blank')">Add to Chrome</button>
+    </div>
+  </div>
+  <div class="ext-detail-body">
+    <div class="edb-card">
+      <h3>&#9889; Smart Tab Grouping</h3>
+      <p>One click groups all your open tabs by domain — 47 scattered tabs become 6 clean, colour-coded groups instantly. Chrome's native tab groups API makes them persist across sessions.</p>
+    </div>
+    <div class="edb-card">
+      <h3>&#128164; Suspend Inactive Tabs</h3>
+      <p>TabMaster uses Chrome's built-in tab discarding to unload inactive tabs from memory. Typical savings: 80% RAM freed. Tabs reload the moment you click them — nothing is lost.</p>
+    </div>
+    <div class="edb-card">
+      <h3>&#128269; Search All Tabs</h3>
+      <p>Type anything into the search bar and find any open tab instantly by title or URL. Real-time filtering across every open tab — no more hunting through 50 favicons.</p>
+    </div>
+    <div class="edb-card">
+      <h3>&#128465; Duplicate Remover</h3>
+      <p>Accidentally opened the same page three times? TabMaster detects and removes every duplicate tab with a single click, keeping the most recently active copy.</p>
+    </div>
+    <div class="edb-card full">
+      <h3>&#128274; Permissions &amp; Privacy</h3>
+      <div style="margin-top:4px">
+        <div class="perm-row"><div class="perm-name">tabs</div><div class="perm-desc">Reads open tab titles and URLs locally to enable grouping, search and duplicate detection. No data leaves your device.</div></div>
+        <div class="perm-row"><div class="perm-name">tabGroups</div><div class="perm-desc">Creates and names Chrome tab groups when you click "Group tabs". Required for the core grouping feature.</div></div>
+        <div class="perm-row"><div class="perm-name">storage</div><div class="perm-desc">Saves your preferences (e.g. auto-suspend on/off) to chrome.storage.local on your device only. Nothing is synced externally.</div></div>
+        <div class="perm-row"><div class="perm-name">alarms</div><div class="perm-desc">Schedules periodic auto-suspension of inactive tabs in the background. Runs locally — no network access.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     CHATORGANISER DETAIL
+══════════════════════════════════════════════ -->
+<div class="pg" id="pg-chatorganiser">
+  <div style="max-width:1160px;margin:0 auto;padding:40px 32px 0">
+    <button class="edh-back" onclick="go('home')">&#8592; All Extensions</button>
+  </div>
+  <div class="ext-detail-hero">
+    <div>
+      <div class="edh-icon-row">
+        <div class="edh-icon" style="background:rgba(124,58,237,.15)">&#129302;</div>
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--co);margin-bottom:4px">CHROME EXTENSION</div>
+          <div class="hs-badge review" style="display:inline-block">IN REVIEW</div>
+        </div>
+      </div>
+      <div class="edh-name co-acc">ChatOrganiser</div>
+      <p class="edh-tag">One search box for every AI conversation you have ever had — across ChatGPT, Claude, Gemini and Perplexity. Auto-syncs as you browse. Find any chat in seconds.</p>
+      <div class="edh-actions">
+        <button class="btn-lg-acc" style="background:var(--co)" onclick="window.open('https://chromewebstore.google.com','_blank')">&#129302; Notify me when live</button>
+        <button class="btn-ghost" onclick="go('support')">Support</button>
+      </div>
+      <div class="edh-meta">
+        <div class="edh-meta-item">Version: <span>1.0.0</span></div>
+        <div class="edh-meta-item">Platforms: <span>ChatGPT, Claude, Gemini, Perplexity</span></div>
+        <div class="edh-meta-item">Price: <span>Free</span></div>
+        <div class="edh-meta-item">Data collected: <span>None</span></div>
+      </div>
+    </div>
+    <div class="edh-sidebar">
+      <div class="sidebar-card">
+        <div class="sc-label">Extension info</div>
+        <div class="sc-stat-row"><span class="sc-stat-label">Status</span><span class="sc-stat-val" style="color:var(--gold)">IN REVIEW</span></div>
+        <div class="sc-stat-row"><span class="sc-stat-label">Version</span><span class="sc-stat-val">1.0.0</span></div>
+        <div class="sc-stat-row"><span class="sc-stat-label">Price</span><span class="sc-stat-val">Free</span></div>
+        <div class="sc-stat-row"><span class="sc-stat-label">Data collected</span><span class="sc-stat-val" style="color:var(--green)">None</span></div>
+        <div class="sc-stat-row"><span class="sc-stat-label">Manifest</span><span class="sc-stat-val">V3</span></div>
+      </div>
+      <div class="sidebar-card">
+        <div class="sc-label">Supported platforms</div>
+        <div class="sc-stat-row"><span class="sc-stat-label" style="color:#10a37f">ChatGPT</span><span class="sc-stat-val">&#10003;</span></div>
+        <div class="sc-stat-row"><span class="sc-stat-label" style="color:#d97706">Claude</span><span class="sc-stat-val">&#10003;</span></div>
+        <div class="sc-stat-row"><span class="sc-stat-label" style="color:#4285f4">Gemini</span><span class="sc-stat-val">&#10003;</span></div>
+        <div class="sc-stat-row"><span class="sc-stat-label" style="color:#20b2aa">Perplexity</span><span class="sc-stat-val">&#10003;</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="ext-detail-body">
+    <div class="edb-card">
+      <h3>&#128269; Cross-platform Search</h3>
+      <p>Type a keyword and instantly find matching conversations across all four AI platforms at once. Results show the platform, title and are filterable with one click.</p>
+    </div>
+    <div class="edb-card">
+      <h3>&#9889; Auto-sync</h3>
+      <p>ChatOrganiser passively reads conversation titles from the sidebar as you browse each AI platform. No manual importing or exporting — it just works in the background.</p>
+    </div>
+    <div class="edb-card">
+      <h3>&#127888; Platform Filters</h3>
+      <p>Filter results to a single platform in one click. Colour-coded badges and dots make it immediately clear which AI generated which conversation.</p>
+    </div>
+    <div class="edb-card">
+      <h3>&#128274; 100% Local</h3>
+      <p>All conversation data is stored in chrome.storage.local on your device only. Nothing is sent to any server. Your AI conversations remain completely private.</p>
+    </div>
+    <div class="edb-card full">
+      <h3>&#128274; Permissions &amp; Privacy</h3>
+      <div style="margin-top:4px">
+        <div class="perm-row"><div class="perm-name">storage</div><div class="perm-desc">Stores synced conversation titles locally on your device via chrome.storage.local. Nothing is sent externally.</div></div>
+        <div class="perm-row"><div class="perm-name">tabs</div><div class="perm-desc">Used to detect which AI platform you are currently visiting so the correct content script is active.</div></div>
+        <div class="perm-row"><div class="perm-name">host permissions</div><div class="perm-desc">Required for content scripts to read conversation sidebar titles on chatgpt.com, claude.ai, gemini.google.com and perplexity.ai. Page content is never read — only sidebar navigation titles.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PRIVACY
+══════════════════════════════════════════════ -->
 <div class="pg" id="pg-privacy">
   <div class="inner">
-    <div class="ph">
-      <div class="slbl">Legal</div>
+    <div class="pg-header">
+      <div class="eyebrow">Legal</div>
       <h2>Privacy Policy</h2>
-      <p>Privacy should be the default, not an afterthought.</p>
+      <p>Applies to all FKTech Chrome extensions.</p>
       <span class="upd">Last updated: 3 March 2026</span>
     </div>
-    <div class="hbox"><p>&#128274; <strong>Short version:</strong> TabMaster runs entirely in your browser. We collect no personal data, no browsing history and no tab information. Zero.</p></div>
-    <div class="ds">
-      <h3>1. Who We Are</h3>
-      <p>TabMaster is developed and operated by FKTech, Denmark. Contact us at <a href="mailto:support@gettabmaster.com">support@gettabmaster.com</a>.</p>
+    <div class="info-box">&#128274; <strong>Short version:</strong> Every FKTech extension runs entirely in your browser. We collect no personal data, no browsing history, and no conversation content. Zero. Full stop.</div>
+    <div class="doc-section">
+      <h3><span class="num">01</span> Who We Are</h3>
+      <p>FKTech is a solo developer studio based in Denmark. We build Chrome extensions distributed through the Chrome Web Store. Contact: <a href="mailto:privacy@gettabmaster.com">privacy@gettabmaster.com</a></p>
     </div>
-    <div class="ds">
-      <h3>2. Data We Collect</h3>
-      <p>TabMaster does <strong>not</strong> collect, store or transmit any of the following:</p>
+    <div class="doc-section">
+      <h3><span class="num">02</span> Data We Collect</h3>
+      <p>None of our extensions collect, store on external servers, or transmit any of the following:</p>
       <ul>
-        <li>Browsing history or open tab URLs</li>
+        <li>Browsing history or visited URLs</li>
         <li>Tab titles or page content</li>
         <li>Personal identifiable information</li>
         <li>IP addresses or device identifiers</li>
-        <li>Crash reports or analytics</li>
+        <li>AI conversation content</li>
+        <li>Crash reports or usage analytics</li>
       </ul>
-      <p>All operations run entirely within your local browser. No data ever leaves your device.</p>
+      <p>All operations run entirely within your local browser using Chrome APIs. No data ever leaves your device.</p>
     </div>
-    <div class="ds">
-      <h3>3. Chrome Permissions We Request</h3>
-      <ul>
-        <li><strong>tabs</strong> &#8212; to read and manage open tabs locally</li>
-        <li><strong>tabGroups</strong> &#8212; to create and manage Chrome tab groups</li>
-        <li><strong>storage</strong> &#8212; to save your preferences on your device only</li>
-        <li><strong>alarms</strong> &#8212; to enable scheduled auto-suspension of inactive tabs</li>
-      </ul>
-      <p>None of these permissions are used to transmit data externally.</p>
+    <div class="doc-section">
+      <h3><span class="num">03</span> Local Storage Only</h3>
+      <p>Where extensions store data (e.g. preferences, synced conversation titles), this is done exclusively via <code style="font-family:'Space Mono',monospace;font-size:12px;background:var(--surf2);padding:1px 5px;border-radius:3px">chrome.storage.local</code> — stored on your device only and never synced or transmitted.</p>
     </div>
-    <div class="ds">
-      <h3>4. Third-Party Services</h3>
-      <p>TabMaster uses no third-party analytics or advertising services. A future PRO payment system will be handled by Paddle, which has its own privacy policy at paddle.com.</p>
+    <div class="doc-section">
+      <h3><span class="num">04</span> Permissions Justification</h3>
+      <p>Every permission we request has a specific, minimal purpose. Permissions are documented in full on each extension's individual page. We request no permissions beyond what is strictly necessary.</p>
     </div>
-    <div class="ds">
-      <h3>5. Children&#39;s Privacy</h3>
-      <p>TabMaster is not directed at children under 13 and does not knowingly collect information from anyone under 13 years of age.</p>
+    <div class="doc-section">
+      <h3><span class="num">05</span> Third-Party Services</h3>
+      <p>Our extensions use no third-party analytics, advertising, or tracking services. Future PRO payment processing will be handled by Paddle (paddle.com), which has its own privacy policy.</p>
     </div>
-    <div class="ds">
-      <h3>6. Changes to This Policy</h3>
-      <p>We may update this policy. Changes will be communicated via Chrome Web Store update notes. Continued use constitutes acceptance of the updated terms.</p>
+    <div class="doc-section">
+      <h3><span class="num">06</span> Children's Privacy</h3>
+      <p>Our extensions are not directed at children under 13 and we do not knowingly collect information from anyone under 13.</p>
     </div>
-    <div class="ds">
-      <h3>7. Contact</h3>
-      <p>Questions about this policy? Email <a href="mailto:privacy@gettabmaster.com">privacy@gettabmaster.com</a> or use our <a onclick="go('contact')">contact form</a>.</p>
+    <div class="doc-section">
+      <h3><span class="num">07</span> Changes</h3>
+      <p>Changes to this policy will be communicated via Chrome Web Store update notes. Continued use of an extension constitutes acceptance of the updated policy.</p>
+    </div>
+    <div class="doc-section">
+      <h3><span class="num">08</span> Contact</h3>
+      <p>Questions? Email <a href="mailto:privacy@gettabmaster.com">privacy@gettabmaster.com</a> or use our <a onclick="go('contact')">contact form</a>.</p>
     </div>
   </div>
 </div>
 
-<!-- TERMS -->
+<!-- ══════════════════════════════════════════════
+     TERMS
+══════════════════════════════════════════════ -->
 <div class="pg" id="pg-terms">
   <div class="inner">
-    <div class="ph">
-      <div class="slbl">Legal</div>
+    <div class="pg-header">
+      <div class="eyebrow">Legal</div>
       <h2>Terms of Service</h2>
-      <p>Simple and fair. No legalese traps.</p>
+      <p>Applies to all FKTech Chrome extensions.</p>
       <span class="upd">Last updated: 3 March 2026</span>
     </div>
-    <div class="ds">
-      <h3>1. Acceptance of Terms</h3>
-      <p>By installing or using TabMaster you agree to these Terms of Service. If you do not agree, please uninstall the extension. These terms apply to the free version and any future PRO subscription.</p>
+    <div class="doc-section">
+      <h3><span class="num">01</span> Acceptance</h3>
+      <p>By installing or using any FKTech extension, you agree to these Terms. If you do not agree, please uninstall the extension. These terms apply to all free and future PRO versions.</p>
     </div>
-    <div class="ds">
-      <h3>2. Licence</h3>
-      <p>FKTech grants you a personal, non-exclusive, non-transferable licence to use TabMaster for personal or commercial productivity purposes. You may not:</p>
+    <div class="doc-section">
+      <h3><span class="num">02</span> Licence</h3>
+      <p>FKTech grants you a personal, non-exclusive, non-transferable licence to use our extensions for personal or commercial productivity purposes. You may not:</p>
       <ul>
-        <li>Reverse engineer or decompile the extension</li>
-        <li>Redistribute or resell the extension or its components</li>
-        <li>Use the extension for any unlawful purpose</li>
+        <li>Reverse engineer, decompile, or disassemble any extension</li>
+        <li>Redistribute or resell any extension or its components</li>
+        <li>Use any extension for any unlawful purpose</li>
+        <li>Remove or alter any copyright or proprietary notices</li>
       </ul>
     </div>
-    <div class="ds">
-      <h3>3. Free Version</h3>
-      <p>The free version is provided &#34;as is&#34; without warranties of any kind. We reserve the right to modify, limit or discontinue features of the free tier at any time with reasonable notice.</p>
+    <div class="doc-section">
+      <h3><span class="num">03</span> Free Version</h3>
+      <p>Free versions are provided "as is" without warranties. We may modify, limit, or discontinue free features at any time with reasonable notice via Chrome Web Store update notes.</p>
     </div>
-    <div class="ds">
-      <h3>4. PRO Subscription (Upcoming)</h3>
+    <div class="doc-section">
+      <h3><span class="num">04</span> PRO Subscriptions (Upcoming)</h3>
       <ul>
-        <li>Subscriptions are billed monthly or annually in advance</li>
-        <li>You may cancel at any time; access continues until the end of the billing period</li>
-        <li>Refunds are available within 14 days if the product does not work as described</li>
+        <li>Billed monthly or annually in advance</li>
+        <li>Cancel at any time &mdash; access continues until end of billing period</li>
+        <li>14-day refund available if the product does not work as described</li>
+        <li>Prices listed in EUR or USD; may vary by region</li>
       </ul>
     </div>
-    <div class="ds">
-      <h3>5. Disclaimer of Warranties</h3>
-      <p>TabMaster is provided &#34;as is&#34;. We make no warranties regarding reliability, availability or fitness for a particular purpose. Your use is at your own risk.</p>
+    <div class="doc-section">
+      <h3><span class="num">05</span> Disclaimer</h3>
+      <p>Extensions are provided "as is". FKTech makes no warranties regarding reliability, uptime, or fitness for any particular purpose. Use is at your own risk.</p>
     </div>
-    <div class="ds">
-      <h3>6. Limitation of Liability</h3>
-      <p>To the maximum extent permitted by Danish law, FKTech shall not be liable for any indirect, incidental or consequential damages arising from your use of TabMaster.</p>
+    <div class="doc-section">
+      <h3><span class="num">06</span> Limitation of Liability</h3>
+      <p>To the maximum extent permitted by Danish law, FKTech shall not be liable for any indirect, incidental, or consequential damages arising from your use of our extensions.</p>
     </div>
-    <div class="ds">
-      <h3>7. Governing Law</h3>
-      <p>These terms are governed by the laws of Denmark. Any disputes shall be resolved in the courts of Denmark.</p>
+    <div class="doc-section">
+      <h3><span class="num">07</span> Governing Law</h3>
+      <p>These terms are governed by the laws of Denmark. Disputes shall be resolved in the courts of Denmark.</p>
     </div>
-    <div class="ds">
-      <h3>8. Contact</h3>
+    <div class="doc-section">
+      <h3><span class="num">08</span> Contact</h3>
       <p>Questions? Email <a href="mailto:legal@gettabmaster.com">legal@gettabmaster.com</a>.</p>
     </div>
   </div>
 </div>
 
-<!-- CONTACT -->
+<!-- ══════════════════════════════════════════════
+     CONTACT
+══════════════════════════════════════════════ -->
 <div class="pg" id="pg-contact">
-  <div class="inner" style="max-width:880px">
-    <div class="ph">
-      <div class="slbl">Get in touch</div>
-      <h2>Contact Us</h2>
+  <div class="inner-wide">
+    <div class="pg-header">
+      <div class="eyebrow">Get in touch</div>
+      <h2>Contact</h2>
       <p>We typically respond within 24 hours on business days.</p>
     </div>
-    <div class="cgrid">
+    <div class="contact-grid">
       <div>
-        <h3 style="font-family:Syne,sans-serif;font-size:20px;font-weight:700;margin-bottom:18px">Reach us directly</h3>
-        <div class="ci"><div class="cii">&#128231;</div><div class="cit"><strong>General</strong><span>hello@gettabmaster.com</span></div></div>
-        <div class="ci"><div class="cii">&#128295;</div><div class="cit"><strong>Support</strong><span>support@gettabmaster.com</span></div></div>
-        <div class="ci"><div class="cii">&#128274;</div><div class="cit"><strong>Privacy &amp; Legal</strong><span>privacy@gettabmaster.com</span></div></div>
-        <div class="ci"><div class="cii">&#127963;</div><div class="cit"><strong>Company</strong><span>FKTech, Denmark &#127465;&#127472;</span></div></div>
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:18px">Reach us directly</h3>
+        <div class="contact-info-item"><div class="cii-icon">&#128231;</div><div class="cii-text"><strong>General</strong><span>hello@gettabmaster.com</span></div></div>
+        <div class="contact-info-item"><div class="cii-icon">&#128295;</div><div class="cii-text"><strong>Support</strong><span>support@gettabmaster.com</span></div></div>
+        <div class="contact-info-item"><div class="cii-icon">&#128274;</div><div class="cii-text"><strong>Privacy &amp; Legal</strong><span>privacy@gettabmaster.com</span></div></div>
+        <div class="contact-info-item"><div class="cii-icon">&#127963;</div><div class="cii-text"><strong>Company</strong><span>FKTech &mdash; Denmark &#127465;&#127472;</span></div></div>
       </div>
       <div>
-        <h3 style="font-family:Syne,sans-serif;font-size:20px;font-weight:700;margin-bottom:18px">Send a message</h3>
-        <div class="fg"><label>Your name</label><input class="fc2" type="text" id="cn" placeholder="Jane Smith"/></div>
-        <div class="fg"><label>Email address</label><input class="fc2" type="email" id="ce" placeholder="jane@example.com"/></div>
-        <div class="fg"><label>Subject</label>
-          <select class="fc2" id="cs">
-            <option value="">Select a topic...</option>
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:18px">Send a message</h3>
+        <div class="form-group"><label>Name</label><input class="form-ctrl" type="text" id="cn" placeholder="Your name"/></div>
+        <div class="form-group"><label>Email</label><input class="form-ctrl" type="email" id="ce" placeholder="you@example.com"/></div>
+        <div class="form-group"><label>Extension</label>
+          <select class="form-ctrl" id="cx">
+            <option value="">Select extension...</option>
+            <option>TabMaster</option>
+            <option>ChatOrganiser</option>
+            <option>General / Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Subject</label>
+          <select class="form-ctrl" id="cs">
+            <option value="">Select topic...</option>
             <option>Bug report</option>
             <option>Feature request</option>
             <option>PRO subscription</option>
@@ -287,48 +813,54 @@ footer{border-top:1px solid var(--bord);padding:28px 40px;display:flex;align-ite
             <option>Other</option>
           </select>
         </div>
-        <div class="fg"><label>Message</label><textarea class="fc2" rows="5" id="cm" placeholder="Tell us how we can help..."></textarea></div>
-        <button class="fsub" onclick="sendMsg()">Send message &#8594;</button>
-        <div class="fsuc" id="fsuc">&#10003; Message sent! We will get back to you within 24 hours.</div>
+        <div class="form-group"><label>Message</label><textarea class="form-ctrl" rows="4" id="cm" placeholder="How can we help?"></textarea></div>
+        <button class="form-submit" onclick="sendMsg()">Send message &#8594;</button>
+        <div class="form-success" id="fsuc">&#10003; Message sent! We will reply within 24 hours.</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SUPPORT -->
+<!-- ══════════════════════════════════════════════
+     SUPPORT
+══════════════════════════════════════════════ -->
 <div class="pg" id="pg-support">
-  <div class="inner" style="max-width:880px">
-    <div class="ph">
-      <div class="slbl">Help Center</div>
+  <div class="inner-wide">
+    <div class="pg-header">
+      <div class="eyebrow">Help Center</div>
       <h2>Support</h2>
-      <p>Everything you need to get the most out of TabMaster.</p>
+      <p>Find answers or reach the team directly.</p>
     </div>
-    <div class="sgrid">
-      <div class="scard" onclick="window.open('https://chromewebstore.google.com','_blank')"><div class="scard-ic">&#11015;</div><h4>Installation</h4><p>Get TabMaster from the Chrome Web Store</p></div>
-      <div class="scard" onclick="document.getElementById('faqtop').scrollIntoView({behavior:'smooth'})"><div class="scard-ic">&#10067;</div><h4>FAQ</h4><p>Answers to common questions</p></div>
-      <div class="scard" onclick="go('contact')"><div class="scard-ic">&#128172;</div><h4>Contact Support</h4><p>Get help from the team directly</p></div>
-      <div class="scard" onclick="go('privacy')"><div class="scard-ic">&#128274;</div><h4>Privacy</h4><p>How we protect your data</p></div>
+    <div class="support-cards">
+      <div class="support-card" onclick="go('tabmaster')"><div class="support-card-ico">&#9889;</div><h4>TabMaster</h4><p>Docs &amp; feature guide</p></div>
+      <div class="support-card" onclick="go('chatorganiser')"><div class="support-card-ico">&#129302;</div><h4>ChatOrganiser</h4><p>Docs &amp; feature guide</p></div>
+      <div class="support-card" onclick="go('contact')"><div class="support-card-ico">&#128172;</div><h4>Contact</h4><p>Email the team directly</p></div>
+      <div class="support-card" onclick="go('privacy')"><div class="support-card-ico">&#128274;</div><h4>Privacy</h4><p>How we protect your data</p></div>
     </div>
-    <div class="slbl" id="faqtop" style="margin-bottom:22px">Frequently Asked Questions</div>
-    <div class="faq"><div class="fq" onclick="faq(this)">How do I install TabMaster? <span class="chev">&#9660;</span></div><div class="fa"><div class="fa-in">Go to the Chrome Web Store and search for TabMaster, or click Add to Chrome on this page. Click Add extension in the Chrome popup. The lightning bolt icon will appear in your toolbar.</div></div></div>
-    <div class="faq"><div class="fq" onclick="faq(this)">Does TabMaster collect my browsing data? <span class="chev">&#9660;</span></div><div class="fa"><div class="fa-in">No. TabMaster runs 100% locally in your browser. We do not collect, store or transmit any browsing history, URLs or personal information. See our Privacy Policy for full details.</div></div></div>
-    <div class="faq"><div class="fq" onclick="faq(this)">How does Suspend inactive tabs work? <span class="chev">&#9660;</span></div><div class="fa"><div class="fa-in">TabMaster uses Chrome's built-in tab discarding to unload inactive tabs from memory. The tab stays visible in your tab bar but uses no RAM. Clicking the tab reloads it instantly.</div></div></div>
-    <div class="faq"><div class="fq" onclick="faq(this)">Will my tab groups be saved when I close Chrome? <span class="chev">&#9660;</span></div><div class="fa"><div class="fa-in">Chrome native tab groups persist if you have Continue where you left off enabled in Chrome settings. Full session save and restore is planned as a PRO feature in a future update.</div></div></div>
-    <div class="faq"><div class="fq" onclick="faq(this)">Is TabMaster free? <span class="chev">&#9660;</span></div><div class="fa"><div class="fa-in">Yes, completely free. A PRO tier with auto-suspend schedules, session saving and cross-device sync is planned for the future. Core features will always remain free.</div></div></div>
-    <div class="faq"><div class="fq" onclick="faq(this)">TabMaster is not working. What should I do? <span class="chev">&#9660;</span></div><div class="fa"><div class="fa-in">Try these steps: 1) Click the puzzle icon and pin TabMaster. 2) Right-click the extension icon and toggle it off and on. 3) Restart Chrome. Still stuck? Contact us at support@gettabmaster.com and we will respond within 24 hours.</div></div></div>
-    <div class="faq"><div class="fq" onclick="faq(this)">How do I report a bug or request a feature? <span class="chev">&#9660;</span></div><div class="fa"><div class="fa-in">Use the Contact page or email support@gettabmaster.com directly. Feature requests are very welcome and the roadmap is shaped entirely by user feedback.</div></div></div>
-    <div style="margin-top:44px;padding:28px;background:var(--surf);border:1px solid var(--bord);border-radius:14px;text-align:center">
-      <div style="font-size:26px;margin-bottom:10px">&#129300;</div>
-      <div style="font-family:Syne,sans-serif;font-size:19px;font-weight:700;margin-bottom:7px">Still need help?</div>
-      <div style="color:var(--muted);margin-bottom:18px;font-size:13px">Our team responds within 24 hours on business days.</div>
-      <button class="bp" onclick="go('contact')">Contact Support &#8594;</button>
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--acc);letter-spacing:1px;text-transform:uppercase;margin-bottom:18px" id="faqtop">FAQ</div>
+    <div class="faq-item"><div class="faq-q" onclick="faq(this)">How do I install an extension? <span class="chev">&#9660;</span></div><div class="faq-a"><div class="faq-a-in">Go to the Chrome Web Store page for the extension and click "Add to Chrome". Confirm by clicking "Add extension" in the popup. The extension icon will appear in your Chrome toolbar.</div></div></div>
+    <div class="faq-item"><div class="faq-q" onclick="faq(this)">Do FKTech extensions collect any data? <span class="chev">&#9660;</span></div><div class="faq-a"><div class="faq-a-in">No. All FKTech extensions run entirely locally in your browser. We never collect, store on external servers, or transmit any personal data, browsing history, or usage information.</div></div></div>
+    <div class="faq-item"><div class="faq-q" onclick="faq(this)">Why does TabMaster need host permissions? <span class="chev">&#9660;</span></div><div class="faq-a"><div class="faq-a-in">The host permission allows Chrome's tabs API to return full URLs for open tabs on all domains. Without it, URLs are hidden and TabMaster cannot group tabs by domain or detect duplicates. The extension never reads page content and never injects scripts into web pages.</div></div></div>
+    <div class="faq-item"><div class="faq-q" onclick="faq(this)">Why does ChatOrganiser need access to AI platform sites? <span class="chev">&#9660;</span></div><div class="faq-a"><div class="faq-a-in">ChatOrganiser uses content scripts to read the conversation sidebar titles on ChatGPT, Claude, Gemini and Perplexity. Only sidebar navigation text (conversation titles) is read — no message content, no account details, nothing else. All data stays on your device.</div></div></div>
+    <div class="faq-item"><div class="faq-q" onclick="faq(this)">An extension is not working. What should I do? <span class="chev">&#9660;</span></div><div class="faq-a"><div class="faq-a-in">Try: 1) Click the puzzle icon and pin the extension. 2) Right-click the extension icon and toggle it off and back on. 3) Restart Chrome. Still stuck? Contact us at support@gettabmaster.com with details and we respond within 24 hours.</div></div></div>
+    <div class="faq-item"><div class="faq-q" onclick="faq(this)">Are the extensions free? <span class="chev">&#9660;</span></div><div class="faq-a"><div class="faq-a-in">Yes — core features are completely free. A PRO tier is planned for both extensions, adding power-user features like session saving and auto-suspend schedules. Core features will always remain free.</div></div></div>
+    <div class="faq-item"><div class="faq-q" onclick="faq(this)">How do I report a bug or request a feature? <span class="chev">&#9660;</span></div><div class="faq-a"><div class="faq-a-in">Use the Contact page or email support@gettabmaster.com. Feature requests are very welcome — the roadmap is driven entirely by user feedback.</div></div></div>
+    <div style="margin-top:36px;padding:24px;background:var(--surf);border:1px solid var(--bord);border-radius:12px;text-align:center">
+      <div style="font-size:24px;margin-bottom:8px">&#129300;</div>
+      <div style="font-size:17px;font-weight:700;margin-bottom:6px">Still need help?</div>
+      <div style="color:var(--muted2);font-size:13px;margin-bottom:16px">We respond within 24 hours on business days.</div>
+      <button class="btn-acc" onclick="go('contact')">Contact support &#8594;</button>
     </div>
   </div>
 </div>
 
 <footer>
-  <div class="fl">&#169; 2026 FKTech &#183; TabMaster &#183; Made in Denmark &#127465;&#127472;</div>
-  <div class="flinks">
+  <div class="footer-brand">
+    <div class="footer-mark">FK</div>
+    <div class="footer-name">FKTech &copy; 2026 &mdash; Made in Denmark &#127465;&#127472;</div>
+  </div>
+  <div class="footer-links">
+    <a onclick="go('home')">Extensions</a>
     <a onclick="go('privacy')">Privacy</a>
     <a onclick="go('terms')">Terms</a>
     <a onclick="go('support')">Support</a>
@@ -337,23 +869,25 @@ footer{border-top:1px solid var(--bord);padding:28px 40px;display:flex;align-ite
 </footer>
 
 <script>
+var PAGES=['home','tabmaster','chatorganiser','privacy','terms','contact','support'];
 function go(id){
-  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
-  document.querySelectorAll('.nl').forEach(function(l){l.classList.remove('on');});
+  PAGES.forEach(function(p){
+    var pg=document.getElementById('pg-'+p);
+    var nl=document.getElementById('nl-'+p);
+    if(pg) pg.classList.remove('on');
+    if(nl) nl.classList.remove('on');
+  });
   var pg=document.getElementById('pg-'+id);
-  if(pg)pg.classList.add('on');
   var nl=document.getElementById('nl-'+id);
-  if(nl)nl.classList.add('on');
+  if(pg) pg.classList.add('on');
+  if(nl) nl.classList.add('on');
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function faq(el){
-  var ans=el.nextElementSibling;
+  var a=el.nextElementSibling;
   var isOpen=el.classList.contains('open');
-  document.querySelectorAll('.fq').forEach(function(q){
-    q.classList.remove('open');
-    q.nextElementSibling.classList.remove('open');
-  });
-  if(!isOpen){el.classList.add('open');ans.classList.add('open');}
+  document.querySelectorAll('.faq-q').forEach(function(q){q.classList.remove('open');q.nextElementSibling.classList.remove('open');});
+  if(!isOpen){el.classList.add('open');a.classList.add('open');}
 }
 function sendMsg(){
   var n=document.getElementById('cn').value.trim();
@@ -361,11 +895,12 @@ function sendMsg(){
   var m=document.getElementById('cm').value.trim();
   if(!n||!e||!m){alert('Please fill in name, email and message.');return;}
   document.getElementById('fsuc').style.display='block';
-  document.getElementById('cn').value='';
-  document.getElementById('ce').value='';
-  document.getElementById('cm').value='';
+  ['cn','ce','cm'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('cx').value='';
   document.getElementById('cs').value='';
 }
+var h=window.location.hash.replace('#','');
+if(PAGES.indexOf(h)>-1) go(h);
 </script>
 </body>
 </html>
